@@ -1,0 +1,45 @@
+// WindowSize.kt
+enum class WindowSizeClass { Compact, Medium, Expanded }
+
+// Función para determinar la clase de tamaño de ventana
+fun calculateWindowSizeClass(windowDpWidth: Dp): WindowSizeClass {
+    return when {
+        windowDpWidth < 600.dp -> WindowSizeClass.Compact
+        windowDpWidth < 840.dp -> WindowSizeClass.Medium
+        else -> WindowSizeClass.Expanded
+    }
+}
+
+// MainActivity.kt
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val windowSizeClass = calculateWindowSizeClass(LocalConfiguration.current.screenWidthDp.dp)
+            ReplyApp(windowSizeClass = windowSizeClass)
+        }
+    }
+}
+
+// ReplyApp.kt
+@Composable
+fun ReplyApp(windowSizeClass: WindowSizeClass) {
+    // Lógica básica para cambiar el diseño según la clase de tamaño
+    if (windowSizeClass == WindowSizeClass.Compact) {
+        CompactScreen()
+    } else {
+        MediumOrExpandedScreen()
+    }
+}
+
+@Composable
+fun CompactScreen() {
+    // Implementación de la pantalla compacta
+    Text(text = "Compact Screen")
+}
+
+@Composable
+fun MediumOrExpandedScreen() {
+    // Implementación de la pantalla para tamaños medianos o expandidos
+    Text(text = "Medium/Expanded Screen")
+}
