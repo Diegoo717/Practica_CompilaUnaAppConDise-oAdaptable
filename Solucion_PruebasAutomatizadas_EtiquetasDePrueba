@@ -1,0 +1,101 @@
+// ReplyApp.kt - Final
+@Composable
+fun ReplyApp(windowSizeClass: WindowSizeClass) {
+    var selectedEmail by rememberSaveable { mutableStateOf(-1) }
+
+    if (windowSizeClass == WindowSizeClass.Compact) {
+        CompactScreen(
+            selectedEmail = selectedEmail,
+            onEmailSelected = { selectedEmail = it }
+        )
+    } else {
+        ListDetailScreen(
+            selectedEmail = selectedEmail,
+            onEmailSelected = { selectedEmail = it }
+        )
+    }
+}
+
+@Composable
+fun CompactScreen(
+    selectedEmail: Int,
+    onEmailSelected: (Int) -> Unit
+) {
+    EmailList(onEmailSelected = onEmailSelected)
+}
+
+// ListDetailScreen con testTags
+@Composable
+fun ListDetailScreen(
+    selectedEmail: Int,
+    onEmailSelected: (Int) -> Unit
+) {
+    Row {
+        EmailList(
+            onEmailSelected = onEmailSelected,
+            modifier = Modifier
+                .weight(1f)
+                .testTag("EmailList")
+        )
+        EmailDetails(
+            emailId = selectedEmail,
+            modifier = Modifier
+                .weight(1f)
+                .testTag("EmailDetails")
+        )
+    }
+}
+
+// EmailList con testTag
+@Composable
+fun EmailList(onEmailSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
+        items(10) { index ->
+            Text(
+                text = "Email $index",
+                modifier = Modifier
+                    .clickable { onEmailSelected(index) }
+                    .testTag("EmailItem$index")
+            )
+        }
+    }
+}
+
+// EmailDetails con testTag
+@Composable
+fun EmailDetails(emailId: Int, modifier: Modifier = Modifier) {
+    Text(text = "Email Details for Email $emailId", modifier = modifier.testTag("EmailDetails"))
+}
+
+// Pruebas automatizadas
+@get:Rule
+val composeTestRule = createAndroidComposeRule<MainActivity>()
+
+@Test
+fun compactScreen_showsOnlyEmailList() {
+    composeTestRule.setContent {
+        ReplyApp(windowSizeClass = WindowSizeClass.Compact)
+    }
+    composeTestRule.onNodeWithTag("EmailList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EmailDetails").assertDoesNotExist()
+}
+
+@Test
+fun expandedScreen_showsEmailListAndDetails() {
+    composeTestRule.setContent {
+        ReplyApp(windowSizeClass = WindowSizeClass.Expanded)
+    }
+    composeTestRule.onNodeWithTag("EmailList").assertIsDisplayed()
+    composeTestRule.onNodeWithTag("EmailDetails").assertIsDisplayed()
+}
+
+@Test
+fun emailSelection_persistsOnRotation() {
+    composeTestRule.setContent {
+        ReplyApp(windowSizeClass = WindowSizeClass.Compact)
+    }
+    composeTestRule.onNodeWithTag("EmailItem1").performClick()
+    composeTestRule.onNodeWithTag("EmailDetails").assertTextContains("Email Details for Email 1")
+    composeTestRule.activityRule.scenario.recreate() // Simulación de cambio de configuración
+    composeTestRule.onNodeWithTag("EmailDetails").assertTextContains("Email Details for Email 1")
+}
