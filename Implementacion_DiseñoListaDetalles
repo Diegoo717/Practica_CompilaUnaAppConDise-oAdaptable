@@ -1,0 +1,47 @@
+// ReplyApp.kt
+@Composable
+fun ReplyApp(windowSizeClass: WindowSizeClass) {
+    if (windowSizeClass == WindowSizeClass.Compact) {
+        CompactScreen()
+    } else {
+        ListDetailScreen()
+    }
+}
+
+@Composable
+fun ListDetailScreen() {
+    Row {
+        // Lista de correos
+        EmailList(
+            modifier = Modifier.weight(1f)
+        )
+        // Detalles del correo seleccionado
+        EmailDetails(
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+// EmailList.kt
+@Composable
+fun EmailList(modifier: Modifier = Modifier) {
+    // Simulación de una lista de correos
+    LazyColumn(modifier = modifier) {
+        items(10) { index ->
+            Text(text = "Email $index")
+        }
+    }
+}
+
+// EmailDetails.kt
+@Composable
+fun EmailDetails(modifier: Modifier = Modifier) {
+    // Simulación de los detalles de un correo
+    Text(text = "Email Details", modifier = modifier)
+}
+
+// Pruebas iniciales
+@Composable
+fun CompactScreen() {
+    EmailList() // Solo mostramos la lista en pantallas compactas
+}
