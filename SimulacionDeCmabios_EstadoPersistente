@@ -1,0 +1,54 @@
+// ReplyApp.kt
+@Composable
+fun ReplyApp(windowSizeClass: WindowSizeClass) {
+    var selectedEmail by rememberSaveable { mutableStateOf(-1) }
+    
+    if (windowSizeClass == WindowSizeClass.Compact) {
+        CompactScreen(
+            selectedEmail = selectedEmail,
+            onEmailSelected = { selectedEmail = it }
+        )
+    } else {
+        ListDetailScreen(
+            selectedEmail = selectedEmail,
+            onEmailSelected = { selectedEmail = it }
+        )
+    }
+}
+
+@Composable
+fun CompactScreen(
+    selectedEmail: Int,
+    onEmailSelected: (Int) -> Unit
+) {
+    EmailList(onEmailSelected = onEmailSelected)
+}
+
+// Modificación en ListDetailScreen para manejar la selección de correos
+@Composable
+fun ListDetailScreen(
+    selectedEmail: Int,
+    onEmailSelected: (Int) -> Unit
+) {
+    Row {
+        EmailList(onEmailSelected = onEmailSelected, modifier = Modifier.weight(1f))
+        EmailDetails(emailId = selectedEmail, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun EmailList(onEmailSelected: (Int) -> Unit, modifier: Modifier = Modifier) {
+    LazyColumn(modifier = modifier) {
+        items(10) { index ->
+            Text(
+                text = "Email $index",
+                modifier = Modifier.clickable { onEmailSelected(index) }
+            )
+        }
+    }
+}
+
+@Composable
+fun EmailDetails(emailId: Int, modifier: Modifier = Modifier) {
+    Text(text = "Email Details for Email $emailId", modifier = modifier)
+}
